@@ -1,0 +1,190 @@
+<!doctype html>
+<html>
+
+<head>
+
+    <title>Mon Jeu</title>
+    <meta charset="UTF-8">
+    <style>
+        <meta property="og:title" content="Jeu de tir de survie" />
+        <meta property="og:type" content="Jeu" />
+        <meta property="og:url" content="#" />
+        <meta property="og:image" content="" />
+        <meta property="og:site_name" content="ZombieGoomed" />
+        canvas {
+            border: solid 3px black;
+        }
+        
+    </style>
+    </head>
+    
+<body>
+    <div class="menu1"></div>
+    <div class="menu2"></div>
+    <div class="menu3"></div>
+
+    <center><canvas id="canvas" width="1000" height="600">
+        </canvas></center>
+
+    <script>
+        
+  
+        
+        window.onload = function() { //Page chargée
+            
+            
+
+            //fonction pour détecter une collision entre deux objets
+            function collision(object1x, object1y, object1width, object1height, object2x, object2y, object2width, object2height) {
+                if (object1x < object2x + object2width && object1x + object1width > object2x &&
+                    object1y < object2y + object2height && object1y + object1height > object2y) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            var canvas = document.getElementById("canvas"); //importation du canvas
+            var ctx = canvas.getContext("2d"); //importation de l'affichage
+            
+            var menupause = new Image();
+            menupause.src = "pause.png";
+            
+            var background = new Image(); //fond d'écran
+            background.src = "background.png";
+
+            var player = new Image(); //sprite player
+            player.src = "player_right.png";
+
+            var zombie = new Image(50); //sprite zombie
+            zombie.src = "zombie.png";
+
+
+            var x = 0; //x -> player
+            var y = canvas.height - 240; //y -> player
+            var speed = 10; //speed -> player
+            var width_player = 128; //width -> player
+            var height_player = 128; //height -> player
+            var life = 3; //life -> player
+            var cote = "right"; //right ou left
+
+            var x_zombie = canvas.width - 100; //x -> zombie
+            var y_zombie = 340; //x -> zombie
+            var y = canvas.height - 240; //y -> zombie
+            var speed_zombie = 2; //speed -> zombie
+
+            var x_bullet; //x -> bullet
+
+            var FPS = setInterval(draw, 1000 / 30); //Images par seconde
+
+            function draw() { //création de la fonction draw()    
+                ctx.drawImage(background, 0, 0, canvas.width, canvas.height); //affichage du fond d'écran (variable background)  
+                ctx.fillStyle = "rgba(230, 255, 0, 0)"; //Invisible
+                ctx.fillRect(x_bullet, 420, 20, 20); //affichage de la balle (bullet)
+                ctx.drawImage(player, x, y, width_player, height_player); // Affichage du joueur (player)
+                ctx.drawImage(zombie, x_zombie, y_zombie, 180, 180); // Affichage du zombie (zombie)
+                ctx.fillStyle = "white"; //Blanc
+                ctx.fillRect(750, 30, 200, 20); //Affichage de la barre de vie
+                ctx.fillStyle = "red"; //rouge
+
+                if (life >= 1) {
+                    ctx.fillRect(750, 30, 66.6, 20); //affichage vie 1
+                }
+                if (life >= 2) {
+                    ctx.fillRect(816.6, 30, 66.6, 20); //affichage vie 2
+                }
+                if (life >= 3) {
+                    ctx.fillRect(883.2, 30, 66.6, 20); //affichage vie 3
+                }
+                if (life <= 0) {
+                    x = 0;
+                    y = canvas.height - 240;
+                    alert("You Lose !");
+                    life = 3;
+                }
+                x_zombie -= speed_zombie; //déplacement du zombie
+
+                x_bullet = x + 55; //déplacement de la balle en fonction de la position du joueur
+
+                //collision zombie & player
+                if (collision(x, y, width_player, height_player, x_zombie, y_zombie, 180, 180)) {
+                    x_zombie = canvas.width - 100;
+                    y_zombie = 340;
+                    canvas.width - 100;
+                    life -= 1;
+                }
+
+                if (y < canvas.height - 240) { //gravité
+                    y += speed;
+                }
+
+                if (x + 128 < 127) { // détéction collision gauche de l'ecran
+                    x = 0;
+                }
+
+                if (x + 128 > 820) { // détéction collision droit de l'ecran
+                    x = 700;
+                }
+
+                if (y > canvas.height / 2) { //Maximum saut
+                    y = 380;
+                }
+                
+                window.onkeydown = function(e) { //détéction du clavier
+
+                    var key = e.keyCode || e.wich; //récupération de la touche tapée dans la variable key
+
+                    switch (key) { //tests de la variable key
+                        case 27: // escape --> pause
+                            ctx.drawImage(menupause, 0, 0, canvas.width, canvas.height);
+                            break;
+                        case 38: // Jump
+                            y -= 40;
+                            break;
+                        case 37: //gauche
+                            cote = "left";
+                            player.src = "player_left.png";
+                            x -= speed;
+                            break;
+                        case 39: //droit
+                            cote = "right";
+                            x += speed;
+                            player.src = "player_right.png";
+                            break;
+                        case 32: //espace
+                            if (cote == "right") { //si le personnage est tourné vers la droite
+                                player.src = "player_right2.png";
+                                for (i = 0; i < 400; i++) { //boucle qui déplace la balle par 1 pixel jusqu'a 400 pixels
+                                    x_bullet += 1;
+                                    if (collision(x_bullet, 420, 20, 20, x_zombie, y_zombie, 180, 180)) { //détéction collision bullet & zombie
+                                        x_zombie = 1000 * 5;
+                                        y_zombie = 340 * 10;
+                                        speed_zombie = 0;
+                                    }
+                                }
+                            } else { //si le personnage est tourné vers la gauche
+                                player.src = "player_left2.png";
+                                for (i = 0; i < 400; i++) { //boucle qui déplace la balle par 1 pixel jusqu'a 400 pixels
+                                    x_bullet -= 1;
+                                    if (collision(x_bullet, 420, 20, 20, x_zombie, y_zombie, 180, 180)) { //détéction collision bullet & zombie
+                                        x_zombie = 340;
+                                        y_zombie = 340;
+                                        speed_zombie *= 2;
+                                    }
+                                }
+                            }
+
+                        default: //autre
+                            break;
+
+                    }
+                }
+            }
+        }
+    </script>
+    
+
+</body>
+
+
+</html>

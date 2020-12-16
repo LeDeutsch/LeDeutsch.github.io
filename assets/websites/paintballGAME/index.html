@@ -1,0 +1,167 @@
+<!doctype html>
+<html>
+
+<head>
+
+    <title>Mon Jeu</title>
+    <meta charset="UTF-8">
+    <style>
+        canvas {
+            border: solid 3px black;
+        }
+    </style>
+
+</head>
+
+
+
+<body>
+
+    <center><canvas id="canvas" width="1400" height="800">
+        </canvas></center>
+
+    <script>
+        
+  
+        
+        window.onload = function() { //Page chargée
+            
+            
+
+            //fonction pour détecter une collision entre deux objets
+            function collision(object1x, object1y, object1width, object1height, object2x, object2y, object2width, object2height) {
+                if (object1x < object2x + object2width && object1x + object1width > object2x &&
+                    object1y < object2y + object2height && object1y + object1height > object2y) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            
+            
+            
+            var canvas = document.getElementById("canvas"); //importation du canvas
+            var ctx = canvas.getContext("2d"); //importation de l'affichage
+            
+            var background = new Image();
+            background.src = "background.jpg";
+            
+            var speed = 10;
+            
+            
+            //PLAYER1---------------------------------------------------------------------------------|
+            var player1left = new Image();                                                            
+            player1left.src = "player1left.png";
+            var player1right = new Image ();
+            player1right.src = "player1right.png";
+            
+            var x = canvas.width-1290; //création de la variable x pour player1left aux premier plan  |
+			var y = canvas.height-245; //création de la variable y pour player1left aux premier plan  |
+            //                                                                                        |
+            var x_ = canvas.width-380; //création de la variable x pour player1right aux second plan  |
+			var y_ = canvas.height-700;//création de la variable y pour player1right aux second plan  |
+            //----------------------------------------------------------------------------------------
+            
+            //PLAYER2----------------------------------------------------------------------------------|
+            var player2right = new Image();//                                                          |
+            player2right.src = "player2right.png";//                                                   |
+            var player2left = new Image();//                                                           |
+            player2left.src = "player2left.png";//                                                     |
+            //                                                                                         |
+            var x2 = canvas.width-380; //création de la variable x pour player2right aux premier plan  |
+			var y2 = canvas.height-245; //création de la variable y pour player2right aux premier plan |
+            //                                                                                         |
+            var x2_ = canvas.width-1260; //création de la variable x pour player2left aux second plan  |
+			var y2_ = canvas.height-700;//création de la variable y pour player2left aux second plan   |
+            //-----------------------------------------------------------------------------------------
+            
+            var size = 200 // Player1
+            var size_ = 200 // Player2
+			
+			var fire = false
+
+            var FPS = setInterval(draw, 1000 / 30); //Images par seconde
+
+            function draw() { //création de la fonction draw()  
+                ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
+                ctx.drawImage(player1left, x, y, 280, 280);
+                ctx.drawImage(player1right, x_, y_, size, size);
+                ctx.drawImage(player2right, x2, y2, 280, 280);
+                ctx.drawImage(player2left, x2_, y2_, size_, size_);
+                if (fire == true) {
+					ctx.fillStyle = "rgba(30, 30, 200, 1)";
+					ctx.fillRect(x_bullet, y_bullet, 20, 20); //affichage de la balle
+					y_bullet -= speed_bullet;
+				}
+
+                }
+            
+            var x_bullet = x+135;
+            var y_bullet = y+40;
+            var speed_bullet = 10;
+            
+            y_bullet = y + 55;
+            
+            window.onkeydown = function(e){ //détéction du clavier
+					var key = e.keyCode || e.wich; //récupération de la touche tapée dans la variable key
+					switch(key){ //tests de la variable key
+                        case 32://Fire (espace)
+                            // for (i = 0; i < 1000; i++) { //boucle qui déplace la bullet par 1 pixel jusqu'a 1000 pixels
+                            //       y_bullet -= 0.1;
+                            // }
+							
+							fire = true;
+							y_bullet = y+40;
+
+							
+                            break;
+                        case 83:// Bas (S)
+                            y += speed;
+                            y_ -= speed;
+                            size -= 4.5;
+                            break;
+                        case 90://Haut (Z)
+                            y -= speed;
+                            y_ += speed;
+                            size += 4.5;
+                            break;
+                        case 81://Gauche (G)
+                            x -= speed;
+                            x_ += speed;
+                            break;
+                        case 68://Droite (D)
+                            x += speed;
+                            x_ -= speed;
+                            break;
+						case 40: //bas
+							y2 += speed;
+                            y2_ -= speed;
+                            size_ -= 4.5;
+							break;
+						case 38://haut
+							y2 -= speed;
+                            y2_ += speed;
+                            size_ += 4.5;
+							break;
+						case 37://gauche
+							x2 -= speed;
+                            x2_ += speed;
+							break;
+						case 39://droite
+							x2 += speed;
+                            x2_ -= speed;
+							break;
+						defaut:
+							break;
+					}
+				}
+
+        }
+        
+    </script>
+    
+
+</body>
+
+
+</html>
